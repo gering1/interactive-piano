@@ -1,0 +1,29 @@
+p {
+  font-family:  Alegreya;
+  color : Black;
+  font-size : 28px;
+
+}
+
+#perfectContainer {
+
+  margin: 15px;
+  padding: 5px;
+  text-align: center;
+  -background-color: Black ;
+  opacity: .78;
+}
+
+
+
+.perfectButtons {
+  color : White;
+  background-color: #4CAF50;
+  padding: 12px;
+  border:none;
+  margin: 5px;
+  font-size: 20px;
+  opacity: 1;
+  background: rgba(200,0,0,1)
+
+}
