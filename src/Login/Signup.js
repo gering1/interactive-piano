@@ -36,7 +36,12 @@ class SignUp extends React.Component {
             username:'',
             password:'',
             confirmPassword:'',
+            firstName: '',
+            lastName: '',
         }
+        this.handleFirstNameChange = this.handleFirstNameChange.bind(this)
+        this.handleLastNameChange = this.handleLastNameChange.bind(this)
+
         this.handleUsernameChange = this.handleUsernameChange.bind(this);
         this.handlePasswordChange = this.handlePasswordChange.bind(this);
         this.handleConfirmPasswordChange = this.handleConfirmPasswordChange.bind(this);
@@ -61,6 +66,16 @@ class SignUp extends React.Component {
           confirmPassword: e.target.value
     })
 }
+  handleFirstNameChange(e){
+    this.setState({
+      firstName:e.target.value
+    })
+  }
+  handleLastNameChange(e){
+    this.setState({
+      lastName:e.target.value
+    })
+  }
     validateForm = () => {
       return this.state.username.length > 0 && this.state.password.length > 0 && this.state.confirmPassword.length > 0;
     }
@@ -74,7 +89,9 @@ class SignUp extends React.Component {
         else {
             axios.post('http://127.0.0.1:5000/createUser', {
               username: this.state.username,
-              password: this.state.password
+              password: this.state.password,
+              firstName: this.state.firstName,
+              lastName: this.state.lastName
             },
             {withCredentials:false}
             )
@@ -101,9 +118,12 @@ render() {
             Enter Information
           </Typography>
       <form novalidate className = "signupForm" onSubmit = {this.handleSubmit} class = {classes.form}> 
-          <TextField margin = "normal" fullWidth required id="loginText " label="Login" variant="outlined" onChange={this.handleUsernameChange} ></TextField>
+          <TextField margin = "normal" fullWidth required id="loginText " label="Username" variant="outlined" onChange={this.handleUsernameChange} ></TextField>
           <TextField margin = "normal" fullWidth required id="passwordText " label="Password" variant="outlined" onChange={this.handlePasswordChange}></TextField>
           <TextField margin = "normal" fullWidth required id="passwordText " label="Confirm password" variant="outlined" onChange={this.handleConfirmPasswordChange}></TextField>
+          <TextField margin = "normal" fullWidth id="firstNameText " label="First Name" variant="outlined" onChange={this.handleFirstNameChange} ></TextField>
+          <TextField margin = "normal" fullWidth id="lastNameText " label="Last Name" variant="outlined" onChange={this.handleLastNameChange} ></TextField>
+
           <br></br>
           <Button disabled = {!this.validateForm()} className = {classes.submit} fullWidth margin = "normal" variant="contained" type = "submitSignup" color = "primary" >Sign Up</Button>
           <h5 className = "haveAccount"> Already have an account? <NavLink to = "/Login"> Log in</NavLink> </h5>

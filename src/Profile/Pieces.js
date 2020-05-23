@@ -19,13 +19,26 @@ const styles = (theme) => ({
     width: 800
   },
   entry: {
-    marginTop: 100
+    marginTop: 100,
+    marginLeft: 49
   },
   head: {
     backgroundColor: theme.palette.common.black,
     color: theme.palette.common.white,
   },
+
 })
+const StyledTableRow = withStyles((theme) => ({
+  root: {
+    '&:nth-of-type(odd)': {
+      backgroundColor: theme.palette.action.hover,
+    },
+    '&:nth-of-type(even)': {
+      backgroundColor: theme.palette.action.disabled,
+    },
+
+  },
+}))(TableRow);
 class Pieces extends React.Component {
     constructor(props){  
         super(props);    
@@ -42,6 +55,7 @@ class Pieces extends React.Component {
         axios.get(`http://127.0.0.1:5000/selectPieces/${uid}`)
         .then(res => {
           for(var i = 0;i < res.data.length;i++) {
+            console.log(res.data)
               this.state.piece = res.data[i][0]
               this.state.composer = res.data[i][1]
               this.state.status = res.data[i][2]
@@ -82,12 +96,12 @@ class Pieces extends React.Component {
         this.addPieceInfo()
     }
     postPieceInfo = () => {
+      
         axios.post('http://127.0.0.1:5000/insertPieces', {
-            userID: 1,
+            userID: sessionStorage.getItem("userID"),
             piece: this.state.piece,
             composer: this.state.composer,
             status: this.state.status
-
         })
         .then(function (response) {
             console.log(response);
@@ -137,13 +151,13 @@ class Pieces extends React.Component {
         </TableHead>
         <TableBody>
           {this.state.pieces.map(row => (
-            <TableRow key={row.piece}>
+            <StyledTableRow key={row.piece}>
               <TableCell component="th" scope="row">
                 {row.piece}
               </TableCell>
               <TableCell align="right">{row.composer}</TableCell>
               <TableCell align="right">{row.status}</TableCell>
-            </TableRow>
+            </StyledTableRow>
           ))}
         </TableBody>
         </Table>
@@ -165,8 +179,9 @@ class Pieces extends React.Component {
                   onChange = {this.handleStatusChange}></Input>
                   <Button
                   variant = "contained"
-                  color = "primary"
+                  style = {{marginLeft: 10, marginBottom: 10, backgroundColor:"black", color:"white"}}
                   onClick = {this.postAndAdd}
+                 
                   >
                     Add Piece
                 </Button>

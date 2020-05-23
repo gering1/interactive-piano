@@ -4,7 +4,6 @@ import App from './App.js'
 import './index.css';
 import Piano from './piano.js'
 import ProfileView from './Profile/ProfileView'
-import MainView from './Views/MainView.js'
 import Login from './Login/Login.js'
 import Header from './Views/Header.js'
 import * as serviceWorker from './serviceWorker';

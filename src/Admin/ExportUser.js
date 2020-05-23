@@ -13,17 +13,18 @@ class ExportUser extends React.Component {
 
     }
     handleClick = (e) => {
-        axios.get('http://127.0.0.1:5000/exportUsers')
+        // Add timestamp to query to avoid hitting cached value
+        var Today = new Date();
+        axios.get('http://127.0.0.1:5000/exportUsers?rand=' + Today.getTime())
         .then(res => {
             this.setState({ file: res.data });
-          
+            console.log(this.state.file)
+            fileDownload(this.state.file,'test.csv')
         })
         .catch(function (error) {
             console.log(error);
         })
-        //console.log(this.state.file)
-        console.log(this.state.file)
-        fileDownload(this.state.file,'test.csv')
+        
     }
 
     render() {      

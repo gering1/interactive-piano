@@ -84,7 +84,7 @@ export default  function Header({navigation}) {
       </IconButton>
       </Nav.Link>
       <IconButton edge="start" color="inherit" aria-label="menu" className={classes.menuButton}>
-      <MenuIcon />
+     
     </IconButton>
      
       <Typography variant="h5" color="inherit" className = {classes.title}>

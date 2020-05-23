@@ -14,6 +14,7 @@ import Paper from '@material-ui/core/Paper'
 import Select from '@material-ui/core/Select';
 import ToggleButtonGroup from 'react-bootstrap/ToggleButtonGroup';
 import ToggleButton from 'react-bootstrap/ToggleButton';
+import { Typography } from '@material-ui/core';
 const audioContext = new (window.AudioContext || window.webkitAudioContext)();
 const soundfontHostname = 'https://d1pzp51pvbm36p.cloudfront.net';
 
@@ -30,6 +31,8 @@ class ScalePlayer extends React.Component {
         isPlaying: false,
         stopAllNotes: () => console.warn('stopAllNotes not yet loaded'),
         song: [],
+        RHfingering : ["test me"],
+        LHfingering: [],
         testScale: [],
         startNum: 0,
         isMajor: true,
@@ -169,11 +172,14 @@ class ScalePlayer extends React.Component {
             )}
           </DimensionsProvider>
         </div>
+
+
        <div className = "body">
         <div>
         <FormControl className = "scalesForm">
               <InputLabel id="demo-mutiple-name-label">Key</InputLabel>
               <Select
+              minWidth = {200}
               onChange = {this.handleScaleChange}
               value = {this.state.chosenScale}
               >
@@ -197,7 +203,7 @@ class ScalePlayer extends React.Component {
               onChange = {this.handleMajorMinor}
               value = {this.state.isMajor ? "Major" : "Minor"}
               >  
-            
+              
               <MenuItem disabled = {this.state.isMajor} value = "Major">Major</MenuItem>
               <MenuItem disabled = {this.state.isMinor} value = "Minor">Minor</MenuItem>
               </Select>

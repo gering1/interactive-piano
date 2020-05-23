@@ -25,7 +25,8 @@ class CurrentKey extends React.Component {
       
     }
     componentDidMount() {
-        axios.get('http://127.0.0.1:5000/selectkeys')
+        let uid = sessionStorage.getItem("userID")
+        axios.get(`http://127.0.0.1:5000/selectkeys/${uid}`)
           .then(res => {
             console.log(res.data)
             this.state.buttons = res.data
