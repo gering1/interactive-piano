@@ -11,12 +11,29 @@ import jsonify
 import json
 from flaskext.mysql import MySQL
 from flask_sqlalchemy import SQLAlchemy
+'''
+import mysql.connector
 
+db = mysql.connector.connect(
+    host="35.230.31.58",
+    user="root",
+    passwd="88KeysBaby!",
+    database="main"
+)
+
+#test_insert = "INSERT INTO Login(UserID, Username,PasswordHash , password) VALUES (2, 'test', 'test', 'test')"
+myCursor = db.cursor()
+#myCursor.execute(test_insert)
+db.commit()
+'''
 
 app = Flask(__name__)
 CORS(app)
 mysql = MySQL()
-#connect to db here
+app.config['MYSQL_DATABASE_USER'] = 'root'
+app.config['MYSQL_DATABASE_PASSWORD'] = '88KeysBaby!'
+app.config['MYSQL_DATABASE_DB'] = 'main'
+app.config['MYSQL_DATABASE_HOST'] = '35.230.31.58'
 mysql.init_app(app)
 
 conn = mysql.connect()
@@ -42,17 +59,22 @@ def hello_world():
 def scaleStart():
     theKey = request.json["selectedScale"]
     majorMinor = request.json["isMajor"]
+
     if majorMinor == True:
         majorMinor = " Major"
     else:
         majorMinor = " Minor"
 
+    if len(theKey) > 2: #account for sharp/flat scales
+        if majorMinor == " Minor":
+            theKey = theKey[0:2]
+        else:
+            theKey = theKey[3:5]
 
     selectScaleQuery = "SELECT Tonic FROM `Key` WHERE KeyName=" + repr(theKey + majorMinor)
     print(selectScaleQuery)
     cursor.execute(selectScaleQuery)
     startNum = cursor.fetchone()
-    print(startNum)
     conn.commit()
     return str(startNum)
 @app.route('/updatekeys/<uid>', methods=['POST'])
@@ -169,12 +191,21 @@ def selectPieces(uid):
 
 @app.route('/createUser', methods=['POST'])
 def insert_user():
-    username = request.json["username"]
-    passwd = request.json["password"]
-
-    insertUserQuery = "INSERT INTO Login(Username,Password) VALUES('{}','{}') ".format(username,passwd)
     try:
+        username = request.json["username"]
+        passwd = request.json["password"]
+        firstName = request.json["firstName"]
+        lastName = request.json["lastName"]
+        print(firstName, lastName)
+        insertUserQuery = "INSERT INTO Login(Username,Password) VALUES('{}','{}') ".format(username,passwd)
         cursor.execute(insertUserQuery)
+        id = cursor.lastrowid
+        print(cursor.lastrowid)
+
+        insertProfileQuery = "INSERT INTO Profile(UserID,FirstName,LastName) VALUES({},'{}','{}')".format(id,firstName,lastName)
+        cursor.execute(insertProfileQuery)
+        insertKeysQuery = "INSERT INTO CompletedKeys(UserID) VALUES ({})".format(id)
+        cursor.execute(insertKeysQuery)
         conn.commit()
         return "good"
     except:
@@ -222,15 +253,15 @@ def insertPieces():
     return "ok"
 
 
-@app.route('/selectkeys', methods=['GET'])
-def get_keys():
+@app.route('/selectkeys/<uid>', methods=['GET'])
+def get_keys(uid):
     # SELECT ALL ENTRIES THAT HAVE KEY COMPLETED... will have to check user ID later
     cursor.execute("SELECT AMajorCompleted, BMajorCompleted, CMajorCompleted,DMajorCompleted,EMajorCompleted,"
                    "FMajorCompleted,GMajorCompleted, BFlatMajorCompleted, EFlatMajorCompleted, AFlatMajorCompleted,"
                    "DFlatMajorCompleted, GFlatMajorCompleted, AMinorCompleted,BMinorCompleted, CMinorCompleted,"
                    "DMinorCompleted, EMinorCompleted, FMinorCompleted, GMinorCompleted, ASharpMinorCompleted, "
                    "CSharpMinorCompleted, DSharpMinorCompleted, FSharpMinorCompleted, GSharpMinorCompleted"
-                   " FROM CompletedKeys WHERE UserID = 1")
+                   " FROM CompletedKeys WHERE UserID = {}".format(uid))
     data = cursor.fetchall()
 
     completesL = [j for x in data for j in x]  # create list of completed key booleans
@@ -250,13 +281,17 @@ def set_deleted_user():
 
 @app.route('/exportUsers', methods=['GET'])
 def export_users():
-    exportQuery = ("SELECT * FROM Pieces")
+    exportQuery = ("SELECT Profile.UserID,FirstName,LastName,Username FROM Profile JOIN Login ON Profile.UserID = Login.UserID WHERE Login.isDeleted = 0;")
+
     cursor.execute(exportQuery)
     data = cursor.fetchall()
     print(data)
-    completesL = [j for x in data for j in x]
+    completesL = [list(i) for i in data]
+    print(completesL)
     temp = io.StringIO()
     writer = csv.writer(temp)
+    headers = ["UserID", "First Name","Last Name", "Username"]
+    writer.writerow(headers)
     for i in completesL:
             writer.writerow(i)
 
