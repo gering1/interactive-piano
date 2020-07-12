@@ -1,0 +1,24 @@
+.technique-container {
+    display:flex;
+    flex-direction: column;
+    margin:auto;
+    padding:20px;
+    align-items: center;
+    width: 75%;
+    height: 100%;
+    background-color:rgba(0, 0, 0, 0.54);
+
+}
+.technique-general-list {
+   
+   }
+ 
+.technique-vids {
+    
+}
+.technique-vid-labels {
+    align-items: flex-start;
+}
+.technique-header {
+    margin: 0px 0px 0px 0px;
+}

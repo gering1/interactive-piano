@@ -9,7 +9,7 @@ import TextField from '@material-ui/core/TextField'
 import Typography from '@material-ui/core/Typography'
 const styles = (theme) => ({
     paper: {
-      marginTop: theme.spacing(8),
+      
       display: 'flex',
       flexDirection: 'column',
       alignItems: 'center',

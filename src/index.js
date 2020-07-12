@@ -2,7 +2,6 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import App from './App.js'
 import './index.css';
-import Piano from './piano.js'
 import ProfileView from './Profile/ProfileView'
 import Login from './Login/Login.js'
 import Header from './Views/Header.js'

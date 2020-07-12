@@ -2,30 +2,15 @@ from flask import Flask
 from flask_cors import CORS
 from flask import request
 from flask import send_file
-import io
 
+import io
+#from Spotify.client import spotify_client 
 import tempfile
 import csv
 from flask import jsonify
 import jsonify
 import json
 from flaskext.mysql import MySQL
-from flask_sqlalchemy import SQLAlchemy
-'''
-import mysql.connector
-
-db = mysql.connector.connect(
-    host="35.230.31.58",
-    user="root",
-    passwd="88KeysBaby!",
-    database="main"
-)
-
-#test_insert = "INSERT INTO Login(UserID, Username,PasswordHash , password) VALUES (2, 'test', 'test', 'test')"
-myCursor = db.cursor()
-#myCursor.execute(test_insert)
-db.commit()
-'''
 
 app = Flask(__name__)
 CORS(app)
@@ -53,7 +38,7 @@ def hello_world():
     print(request.form.get("username"))
     print(request.form.get("password"))
 
-    return 'hello world'
+    return spotify_client.playlist
 
 @app.route('/getScaleStart',methods = ['POST'])
 def scaleStart():
@@ -74,9 +59,11 @@ def scaleStart():
     selectScaleQuery = "SELECT Tonic FROM `Key` WHERE KeyName=" + repr(theKey + majorMinor)
     print(selectScaleQuery)
     cursor.execute(selectScaleQuery)
-    startNum = cursor.fetchone()
+    data = cursor.fetchall()
+    lData = [x for x in data]
+
     conn.commit()
-    return str(startNum)
+    return json.dumps(lData)
 @app.route('/updatekeys/<uid>', methods=['POST'])
 def update_keys(uid):
     if request.headers["Content-Type"] == "application/json":
@@ -278,6 +265,31 @@ def set_deleted_user():
     cursor.execute(updateKeyQuery)
     conn.commit()
     return "ok"
+    
+@app.route('/getFingerings', methods=['POST'])
+def getFingerings():
+    theKey = request.json["selectedScale"]
+    majorMinor = request.json["isMajor"]
+
+    if majorMinor == True:
+        majorMinor = " Major"
+    else:
+        majorMinor = " Minor"
+
+    if len(theKey) > 2: #account for sharp/flat scales
+        if majorMinor == " Minor":
+            theKey = theKey[0:2]
+        else:
+            theKey = theKey[3:5]
+
+    selectFingeringQuery = "SELECT RHFingering, LHFingering FROM `Key` WHERE KeyName=" + repr(theKey + majorMinor)
+    cursor.execute(selectFingeringQuery)
+    data = cursor.fetchall()
+    lData = [x for x in data]
+
+    conn.commit()
+    return json.dumps(lData)
+    return "ok"
 
 @app.route('/exportUsers', methods=['GET'])
 def export_users():
@@ -309,4 +321,4 @@ def export_users():
 
 
 if __name__ == '__main__':
-    app.run()
+    app.run(debug=True)

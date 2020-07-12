@@ -1,0 +1,27 @@
+a {
+    color: white;
+}
+
+
+.startingout-container {
+  
+    display:flex;
+    flex-direction: column;
+    margin:auto;
+    
+    align-items: center;
+    width: 75%;
+    height:100%;
+    background-color:rgba(0, 0, 0, 0.54);   
+}
+
+.books-container {
+    
+    display:flex;
+    flex-direction: column;
+    padding:20px;
+}
+.suggested-books{
+    margin: 0px 0px 0px 0px;
+    margin-top: 30px;
+}

@@ -7,7 +7,7 @@ import Fade from '@material-ui/core/Fade';
 import IconButton from '@material-ui/core/IconButton'
 import HomeIcon from '@material-ui/icons/Home'
 import Nav from 'react-bootstrap/Nav'
-
+import Button from '@material-ui/core/Button'
 import Typography from '@material-ui/core/Typography'
 import Home from './Home.js'
 import Login from '../Login/Login.js'
@@ -23,25 +23,22 @@ import { Link, Route, BrowserRouter as Router,Switch } from "react-router-dom";
 
 const useStyles = makeStyles((theme) => ({
   app: {
-    backgroundColor: theme.palette.secondary.light
+    backgroundColor: theme.palette.background.default
   },
   root: {
-    marginBottom: theme.spacing(10)
-  },
-  menuButton: {
-    
-    marginRight: theme.spacing(2),
+   
   },
   homeButton: {
-    
 
+  },
+  guide: {
+ 
   },
   activeLink: {
     color: theme.palette.secondary.light
   },
   title: {
-    flexGrow:1,
-    marginLeft: theme.spacing(5)
+    flexGrow: 1
   },
   circleButton: {
     
@@ -66,11 +63,6 @@ export default  function Header({navigation}) {
     }
     
   }
-  /*
-  if(redirect === true) {
-    return <Redirect to="/ProfileView"></Redirect>
-  }
-  */
   
   return (
  <>
@@ -83,78 +75,20 @@ export default  function Header({navigation}) {
         <HomeIcon />
       </IconButton>
       </Nav.Link>
-      <IconButton edge="start" color="inherit" aria-label="menu" className={classes.menuButton}>
+      
+      <IconButton color="inherit" aria-label="menu" className={classes.menuButton}>
      
     </IconButton>
-     
-      <Typography variant="h5" color="inherit" className = {classes.title}>
-        Piano Resource
-      </Typography>
-      <div>
-      <IconButton 
-      aria-controls="menu-appbar"
-      edge = ""
-      color = "inherit" 
-      aria-label="account of current user"
-      aria-haspopup="true"
-      onClick={handleMenu}
-      className = {classes.circleButton}
-      >
-        <AccountCircle/>
-      </IconButton>
-              <Menu
-                id="menu-appbar"
-                edge = "end"
-                anchorEl={anchorEl}
-                TransitionComponent={Fade}
-               
-                anchorOrigin={{
-                  vertical: "top",
-                  horizontal: "right"
-                }}
-                keepMounted
-                transformOrigin={{
-                  vertical: "top",
-                  horizontal: "right"
-                }}
-                open={open}
-                onClose={handleClose}
-                >
-                 {console.log(sessionStorage.getItem("userID"))} 
-                 {console.log(sessionStorage.getItem("isAdmin"))}
-                 {sessionStorage.getItem("isAdmin") === "true" ? 
-                <div>
-                <Nav.Link href = "/Dashboard" className = {classes.activeLink}>
-                  <MenuItem key = "dashboardKey" >Dashboard</MenuItem>
-                </Nav.Link>
-                </div>
-                :
-                <div>
-                {null}
-               </div>
-                }
-                {sessionStorage.getItem("userID") !== null  ? 
-                <div>
-                <Nav.Link href = "/ProfileView" className = {classes.activeLink}>
-                  <MenuItem id = "/ProfileView" >Profile</MenuItem>
-                </Nav.Link>
-                <Nav.Link href = "/Login" className = {classes.activeLink}>
-                  <MenuItem key = "logoutKey" onClick={setLogoutandAdmin}>Logout</MenuItem>
-                </Nav.Link>
-      
-                </div>
-                :
-                <div>
-                <Nav.Link href = "/Login" className = {classes.activeLink}>
-                <MenuItem id = "loginKey" >Login</MenuItem>
-                </Nav.Link>
-                
-                </div>
-                
-                }
-                
-                </Menu>
-                </div>
+    <Nav.Link className = "guidelink odd" href ="StartingOut">
+    <MenuItem key = "startGuide">Starting Out</MenuItem>
+    </Nav.Link>
+    <Nav.Link className = "guidelink even" href ="/Technique">
+    <MenuItem key = "startGuide" >Technique</MenuItem>
+    </Nav.Link>
+    <Nav.Link className = "guidelink odd" href ="Playlist">
+    <MenuItem key = "startGuide" >My Playlists</MenuItem>
+    </Nav.Link>
+
     </Toolbar>
   </AppBar>
 </div>

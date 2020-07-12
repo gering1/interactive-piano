@@ -1,6 +1,7 @@
 .navbar {
-  overflow: hidden;
-  background-color: #333;
+  
+  background-color:rgba(0, 0, 0, 0.8);
+  border-bottom: 1px #f48fb1;
 }
 
 .navbar a {
@@ -9,7 +10,7 @@
   color: white;
   text-align: center;
   padding: 12px 16px;
-
+  
   text-decoration: none;
 }
 

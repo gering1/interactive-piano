@@ -1,6 +1,6 @@
 import React from 'react';
 import './ScalePlayer.css';
-import {Piano,MidiNumbers} from 'react-piano';
+import {Piano,MidiNumbers,KeyboardShortcuts} from 'react-piano';
 import FormControl from '@material-ui/core/FormControl'
 import DimensionsProvider from '../piano_tools/DimensionProvider.js';
 import SoundfontProvider from '../piano_tools/SoundfontProvider.js';
@@ -21,25 +21,45 @@ const soundfontHostname = 'https://d1pzp51pvbm36p.cloudfront.net';
 
 const firstHalf = 5
 const secondHalf = 12
+const noteRange = {
+  first: MidiNumbers.fromNote('c2'),
+  last: MidiNumbers.fromNote('b5'),
+};
+
+
+
+const keyboardShortcuts = KeyboardShortcuts.create({
+  firstNote: noteRange.first,
+  lastNote: noteRange.last,
+  keyboardConfig: []
+});
+
+
 
 class ScalePlayer extends React.Component {
 
   constructor(props) {
     super(props);
     this.state = {
+        arpeggio: false,
         activeNotesIndex: 0,
         isPlaying: false,
+        playingMajorChord: false,
+        majorChord: "",
         stopAllNotes: () => console.warn('stopAllNotes not yet loaded'),
         song: [],
-        RHfingering : ["test me"],
-        LHfingering: [],
+        reverseCount: 0,
+        RHfingering : "12312341231234543213214321321",
+        LHfingering: "54321321432132123123412312345",
+        tip: "",
         testScale: [],
         startNum: 0,
         isMajor: true,
         isMinor: false,
         chosenScale: "C",
         scale: "",
-        majorMinor: ""
+        majorMinor: "",
+        speed: 200
     }
     this.playbackIntervalFn = null;
     this.handleScaleClick = this.handleScaleClick.bind(this)
@@ -52,36 +72,76 @@ class ScalePlayer extends React.Component {
       isMinor: !this.state.isMinor})
   }
 
+
+
+ 
   componentDidUpdate(prevProps, prevState) {
+
     if (prevState.isPlaying !== this.state.isPlaying) {
       if (this.state.isPlaying) {
         this.playbackIntervalFn = setInterval(() => {
           this.setState({
-            activeNotesIndex: (this.state.activeNotesIndex + 1) % this.state.song.length,
-          });
-          console.log(this.state.activeNotesIndex)
+            activeNotesIndex: (this.state.activeNotesIndex + 1) % this.state.song.length
+          })
           if(this.state.activeNotesIndex === this.state.song.length-1) {
             this.setState({isPlaying: false})
           }
-        }, 250);
+        }, this.state.speed);
       } else {
         clearInterval(this.playbackIntervalFn);
         this.state.stopAllNotes();
         this.setState({
           activeNotesIndex: 0,
+          reverseCount: 0,
+          reversedFingering: false
         });
       }
     }
   }
+
+
+
+
   handleScaleChange = (event) => {
   
     console.log(event.target.value)
     this.setState({chosenScale:event.target.value}, () => {
       console.log(this.state.chosenScale)
     }) 
-    
+    this.getFingerings()
+
+}
+
+getFingerings = () => {
+  axios.post('http://127.0.0.1:5000/getFingerings', {
+      
+    selectedScale : this.state.chosenScale,
+    isMajor: this.state.isMajor
+})
+.then((response) => {
+    console.log(response)
+
+    let RHfingeringr = response.data[0][0]
+    let LHfingeringr = response.data[0][1]
+  
+    this.setState({
+      RHfingering: RHfingeringr,
+      LHfingering: LHfingeringr
+      
+    })
+  
+})
+}
+
+  handleArpeggioClick = (event) => {
+    this.handleScaleClick();
+    this.setState({
+      arpeggio: true
+    })
   }
+
   handleScaleClick = (event) => {
+  
     console.log(this.state.chosenScale)
     axios.post('http://127.0.0.1:5000/getScaleStart', {
       
@@ -90,18 +150,14 @@ class ScalePlayer extends React.Component {
   })
   .then((response) => {
       console.log(response)
-      var res = ""
-      if(response.data.length === 4){
-        res = response.data[1]
-      }
-      else if(response.data.length === 5){
-        res = response.data[1].concat(response.data[2])
 
-      }
-      var newRes = Number(res)
-      console.log(newRes)
-      this.setState({startNum : newRes})
+      let startNumr = response.data[0][0]
+    
+      this.setState({
+        startNum : startNumr,
+      })
       this.createScale(this.state.startNum)
+    
   })
   .catch(function (error) {
       console.log(error);
@@ -115,28 +171,45 @@ class ScalePlayer extends React.Component {
     //Follow W-W-H-W-W-W-H for major 
     //Follow W-H-W-W-H-1.5-W for harmonic minor
     var pattern = []
-    var arpeggiatedPattern = [0,2,4,7,12,14,16,19,24]
+   
     this.state.isMajor ? this.setState({testScale:[0,2,4,5,7,9,11,12,14,16,17,19,21,23,24]}) : this.setState({testScale : [0,2,3,5,7,8,11,12,14,15,17,19,20,23,24]})
     
   
     var scaled = this.state.testScale.map((number) => [(startNumber+number+35),(startNumber+number+35)+12]);
+  
+    
+    console.log(scaled)
     var rscaled = scaled.slice().reverse();
     var completeScale = scaled.concat(rscaled)
-    var arpeggiated = []
-    for(var i = 0;i <completeScale.length;i=i+2){
-      arpeggiated.push(completeScale[i])
-    }
-    console.log(arpeggiated)
-    console.log(completeScale)
-    this.setState({song:completeScale})
+    var arpeggiated = [0,2,4,7,9,11,14,18,20,22,25,27,29]
+    var arpeggiatedMapped = arpeggiated.map((number) => completeScale[number])
+    
+    this.state.arpeggio ?
+    this.setState(
+      {
+        song:arpeggiatedMapped,
+      }
+      )
+    :
+    this.setState({
+      song:completeScale
+    })
+
+
     this.setPlaying(!this.state.isPlaying)
-  
+    this.setState({
+      arpeggio: false
+    })
     
   }
 
   setPlaying = (value) => {
     this.setState({ isPlaying: value });
   };
+
+  handleSpeedChange = (e) => {
+    this.setState({ speed: e.target.value})
+  }
 
 
   render() {
@@ -145,9 +218,9 @@ class ScalePlayer extends React.Component {
       last: MidiNumbers.fromNote('b5'),
     };
     return(
-      <Paper>
-      <div>
-          <div>
+
+      <>
+          <div className = "scales-container">
           <DimensionsProvider>
             {({ containerWidth, containerHeight }) => (
               <SoundfontProvider
@@ -165,6 +238,7 @@ class ScalePlayer extends React.Component {
                     width={containerWidth}
                     playNote={playNote}
                     stopNote={stopNote}
+                    keyboardShortcuts = {keyboardShortcuts}
                   />
                   
                 )}
@@ -173,18 +247,28 @@ class ScalePlayer extends React.Component {
           </DimensionsProvider>
         </div>
 
+        <div className = "fingering">
+        {this.state.isPlaying ? 
+        <p>{"LH: " }{this.state.LHfingering[this.state.activeNotesIndex]}
+        {"RH: "} {this.state.RHfingering[this.state.activeNotesIndex]}</p>
+      :<p>{<strong>{"Left Fingering: "}</strong>}{this.state.LHfingering}{"   "}{<strong>{"Right Fingering: "}</strong>}{this.state.RHfingering}</p>
+        }
+      </div>
 
-       <div className = "body">
+       <div className = "body-container">
         <div>
-        <FormControl className = "scalesForm">
-              <InputLabel id="demo-mutiple-name-label">Key</InputLabel>
-              <Select
-              minWidth = {200}
+        
+        <FormControl className = "scalesForm" >
+        <InputLabel >Key</InputLabel>
+              <Select  
+              
+              variant = "outlined"
               onChange = {this.handleScaleChange}
               value = {this.state.chosenScale}
+              style = {{backgroundColor: "black"}}
               >
               <MenuItem value = "C">C</MenuItem>
-              <MenuItem value = "D♭">D♭</MenuItem>
+              <MenuItem value = "C#/D♭">C#/D♭</MenuItem>
               <MenuItem value = "D">D</MenuItem>
               <MenuItem value = "E">E</MenuItem>
               <MenuItem value = "F">F</MenuItem>
@@ -196,96 +280,79 @@ class ScalePlayer extends React.Component {
               <MenuItem value = "B">B</MenuItem>  
               </Select>
               </FormControl>
-              <FormControl className = "majorMinorForm" width = "500px">
-              <InputLabel id="majmin-label">Major/Minor</InputLabel>
+          <FormControl className = "majorMinorForm" >
+            <InputLabel id="majmin-label">Major/Minor</InputLabel>
               <Select
-             
+              variant = "outlined"
               onChange = {this.handleMajorMinor}
               value = {this.state.isMajor ? "Major" : "Minor"}
+              style = {{backgroundColor: "black"}}
               >  
               
               <MenuItem disabled = {this.state.isMajor} value = "Major">Major</MenuItem>
               <MenuItem disabled = {this.state.isMinor} value = "Minor">Minor</MenuItem>
               </Select>
-             </FormControl>
+           </FormControl>
+           <FormControl className = "speedForm">
+             <InputLabel id="speed-label">Speed</InputLabel>
+            
+             <Select
+              variant = "outlined"
+             className = "main-select"
+             onChange = {this.handleSpeedChange}
+             value = {this.state.speed}
+             style = {{backgroundColor: "black"}}
+             >
+            
+            <MenuItem value = {800}>.25x </MenuItem>
+            <MenuItem value = {400}>.5x </MenuItem>
+            <MenuItem value = {200}>1x </MenuItem>
+             </Select>
+            
+           </FormControl>
             
           
         </div>
-        
-        <div>
+
+
+        <div className = "play_buttons_container">
             <Button
-              
               variant = "contained"
               color = "secondary"
-               className={classNames('btn', {
-                'btn-outline-info': !this.state.isPlaying,
-                'btn-outline-danger': this.state.isPlaying,
-                })}
+              size = "large"
+              className = 'scale-button'
+             
                 onClick={this.handleScaleClick}
                 >
                   {this.state.isPlaying ? 'Stop' : 'Play Scale'}
              </Button>
+        
+          <Button
+          variant = "contained"
+          color = "secondary"
+          size = "large"
+          className = "scale-button"
+          onClick = {this.handleArpeggioClick}
+          >
+            {this.state.isPlaying ? 'Stop' : 'Play arpeggio'}
+          </Button>
+     
+        
+          <Button
+          variant = "contained"
+          color = "secondary"
+          size = "large"
+          className = "scale-button"
+
+          >
+            {this.state.isPlaying ? 'Stop' : 'Play Chord'}
+          </Button>
+
         </div>
-        </div>
-  </div>
-  </Paper>
+        </div>  
+  </>
+
     )}
                 }
   export default ScalePlayer;
-  /*
-    return (
-      <div>
-        <div className="text-center">
-
-
-        </div>
-        <div className="mt-4">
-          <SoundfontProvider
-            audioContext={this.props.audioContext}
-            instrumentName="acoustic_grand_piano"
-            hostname={this.props.soundfontHostname}
-            onLoad={({ stopAllNotes }) => this.setState({ stopAllNotes })}
-            render={({ isLoading, playNote, stopNote, stopAllNotes }) => (
-              <DimensionsProvider>
-                {({ containerWidth }) => (
-                  <Piano
-                    activeNotes={
-                      this.state.isPlaying ? this.state.song[this.state.activeNotesIndex] : []
-                    }
-                    noteRange={noteRange}
-                    width={containerWidth}
-                    playNote={playNote}
-                    stopNote={stopNote}
-                    disabled={isLoading || !this.state.isPlaying}
-                  />
-                )}
-              </DimensionsProvider>
-            )}
-          />
-        </div>
-        <p>Choose Scale</p>
-        <div>
-            <ToggleButtonGroup type="radio" name="scale" onChange={this.handleScaleChange}>
-                <ToggleButton value="AMajor">AMajor</ToggleButton>
-                <ToggleButton defaultChecked value="CMajor">CMajor</ToggleButton>
-                <ToggleButton value="CChord">CChord</ToggleButton>
-            </ToggleButtonGroup>
-        </div>
-        <p>Press Play to see it in action: </p>
-        <div>
-            <button
-               className={classNames('btn', {
-                'btn-outline-info': !this.state.isPlaying,
-                'btn-outline-danger': this.state.isPlaying,
-                })}
-                onClick={() => this.setPlaying(!this.state.isPlaying)}
-            >
-                  {this.state.isPlaying ? 'Stop' : 'Play Scale'}
-             </button>
-        </div>
-      </div>
-    );
-  }
-}
-*/
 
