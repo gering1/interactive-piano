@@ -15,10 +15,8 @@ from flaskext.mysql import MySQL
 app = Flask(__name__)
 CORS(app)
 mysql = MySQL()
-
-#enter your info here
 app.config['MYSQL_DATABASE_USER'] = 
-app.config['MYSQL_DATABASE_PASSWORD'] =
+app.config['MYSQL_DATABASE_PASSWORD'] = 
 app.config['MYSQL_DATABASE_DB'] = 
 app.config['MYSQL_DATABASE_HOST'] = 
 mysql.init_app(app)
