@@ -15,10 +15,12 @@ from flaskext.mysql import MySQL
 app = Flask(__name__)
 CORS(app)
 mysql = MySQL()
-app.config['MYSQL_DATABASE_USER'] = 'root'
-app.config['MYSQL_DATABASE_PASSWORD'] = '88KeysBaby!'
-app.config['MYSQL_DATABASE_DB'] = 'main'
-app.config['MYSQL_DATABASE_HOST'] = '35.230.31.58'
+
+#enter your info here
+app.config['MYSQL_DATABASE_USER'] = 
+app.config['MYSQL_DATABASE_PASSWORD'] =
+app.config['MYSQL_DATABASE_DB'] = 
+app.config['MYSQL_DATABASE_HOST'] = 
 mysql.init_app(app)
 
 conn = mysql.connect()
@@ -66,60 +68,21 @@ def scaleStart():
     return json.dumps(lData)
 @app.route('/updatekeys/<uid>', methods=['POST'])
 def update_keys(uid):
+  
     if request.headers["Content-Type"] == "application/json":
         print(request.json["currentKeys"])
         return "ok"
     else:
-        theKey = (request.json["currentKeys"])
-        if theKey == "CMajor":
-            keyAttribute = "CMajorCompleted"
-        elif theKey == "GMajor":
-            keyAttribute = "GMajorCompleted"
-        elif theKey == "DMajor":
-            keyAttribute = "DMajorCompleted"
-        elif theKey == "AMajor":
-            keyAttribute = "AMajorCompleted"
-        elif theKey == "EMajor":
-            keyAttribute = "EMajorCompleted"
-        elif theKey == "BMajor":
-            keyAttribute = "BMajorCompleted"
-        elif theKey == "G♭Major":
-            keyAttribute = "GFlatMajorCompleted"
-        elif theKey == "D♭Major":
-            keyAttribute = "DFlatMajorCompleted"
-        elif theKey == "A♭Major":
-            keyAttribute = "AFlatMajorCompleted"
-        elif theKey == "E♭Major":
-            keyAttribute = "EFlatMajorCompleted"
-        elif theKey == "B♭Major":
-            keyAttribute = "BFlatMajorCompleted"
-        elif theKey == "FMajor":
-            keyAttribute = "FMajorCompleted"
-        elif theKey == "AMinor":
-            keyAttribute = "AMinorCompleted"
-        elif theKey == "EMinor":
-            keyAttribute = "EMinorCompleted"
-        elif theKey == "BMinor":
-            keyAttribute = "BMinorCompleted"
-        elif theKey == "F#Minor":
-            keyAttribute = "FSharpMinorCompleted"
-        elif theKey == "C#Minor":
-            keyAttribute = "CSharpMinorCompleted"
-        elif theKey == "G#Minor":
-            keyAttribute = "GSharpMinorCompleted"
-        elif theKey == "D#Minor":
-            keyAttribute = "DSharpMinorCompleted"
-        elif theKey == "A#Minor":
-            keyAttribute = "ASharpMinorCompleted"
-        elif theKey == "FMinor":
-            keyAttribute = "FMinorCompleted"
-        elif theKey == "CMinor":
-            keyAttribute = "CMinorCompleted"
-        elif theKey == "GMinor":
-            keyAttribute = "GMinorCompleted"
-        elif theKey == "DMinor":
-            keyAttribute = "DMinorCompleted"
-
+        key = (request.json["currentKeys"])
+        flatSharpMap = {"♭":"Flat","#":"Sharp"}
+        #check if flat or sharp is in the key (need to change name to look for database column)
+        if any(c in flatSharpMap for c in s):
+            if "♭" in key:
+                key.replace("♭",flatSharpMap["♭"])
+            else:
+                key.replace("#",flatSharpMap["#"])
+     
+        keyAttribute = key + "Completed"
         updateKeyQuery = "UPDATE CompletedKeys SET " + keyAttribute + " = NOT " + keyAttribute + " WHERE UserID=" +uid  #need to incorporate uid
         cursor.execute(updateKeyQuery)
 
@@ -224,7 +187,7 @@ def get_user():
 
 
     else:
-        return "bad"
+        return "good"
 
 
 

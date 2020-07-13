@@ -4,21 +4,14 @@ import {Piano,MidiNumbers,KeyboardShortcuts} from 'react-piano';
 import FormControl from '@material-ui/core/FormControl'
 import DimensionsProvider from '../piano_tools/DimensionProvider.js';
 import SoundfontProvider from '../piano_tools/SoundfontProvider.js';
-import classNames from 'classnames'
 import MenuItem from '@material-ui/core/MenuItem';
 import axios from 'axios';
 import Button from '@material-ui/core/Button'
-import ScaleSelect from './ScaleSelect.js'
 import InputLabel from '@material-ui/core/InputLabel';
-import Paper from '@material-ui/core/Paper'
 import Select from '@material-ui/core/Select';
-import ToggleButtonGroup from 'react-bootstrap/ToggleButtonGroup';
-import ToggleButton from 'react-bootstrap/ToggleButton';
-import { Typography } from '@material-ui/core';
+
 const audioContext = new (window.AudioContext || window.webkitAudioContext)();
 const soundfontHostname = 'https://d1pzp51pvbm36p.cloudfront.net';
-
-
 const firstHalf = 5
 const secondHalf = 12
 const noteRange = {
@@ -26,14 +19,11 @@ const noteRange = {
   last: MidiNumbers.fromNote('b5'),
 };
 
-
-
 const keyboardShortcuts = KeyboardShortcuts.create({
   firstNote: noteRange.first,
   lastNote: noteRange.last,
   keyboardConfig: []
 });
-
 
 
 class ScalePlayer extends React.Component {
@@ -72,24 +62,24 @@ class ScalePlayer extends React.Component {
       isMinor: !this.state.isMinor})
   }
 
-
-
- 
   componentDidUpdate(prevProps, prevState) {
-
     if (prevState.isPlaying !== this.state.isPlaying) {
+      //trigger playing, set interval for list of notes being played
       if (this.state.isPlaying) {
         this.playbackIntervalFn = setInterval(() => {
           this.setState({
             activeNotesIndex: (this.state.activeNotesIndex + 1) % this.state.song.length
           })
+          //stop playing if end of list hit
           if(this.state.activeNotesIndex === this.state.song.length-1) {
             this.setState({isPlaying: false})
           }
         }, this.state.speed);
       } else {
+        
         clearInterval(this.playbackIntervalFn);
         this.state.stopAllNotes();
+        
         this.setState({
           activeNotesIndex: 0,
           reverseCount: 0,
@@ -112,26 +102,26 @@ class ScalePlayer extends React.Component {
 
 }
 
-getFingerings = () => {
-  axios.post('http://127.0.0.1:5000/getFingerings', {
-      
-    selectedScale : this.state.chosenScale,
-    isMajor: this.state.isMajor
-})
-.then((response) => {
-    console.log(response)
+  getFingerings = () => {
+    axios.post('http://127.0.0.1:5000/getFingerings', {
+        
+      selectedScale : this.state.chosenScale,
+      isMajor: this.state.isMajor
+    })
+    .then((response) => {
+        console.log(response)
 
-    let RHfingeringr = response.data[0][0]
-    let LHfingeringr = response.data[0][1]
-  
-    this.setState({
-      RHfingering: RHfingeringr,
-      LHfingering: LHfingeringr
+        let RHfingeringr = response.data[0][0]
+        let LHfingeringr = response.data[0][1]
+      
+        this.setState({
+          RHfingering: RHfingeringr,
+          LHfingering: LHfingeringr
+          
+        })
       
     })
-  
-})
-}
+  }
 
   handleArpeggioClick = (event) => {
     this.handleScaleClick();
@@ -141,31 +131,27 @@ getFingerings = () => {
   }
 
   handleScaleClick = (event) => {
-  
     console.log(this.state.chosenScale)
+    //get selected scale and major/minor
     axios.post('http://127.0.0.1:5000/getScaleStart', {
-      
       selectedScale : this.state.chosenScale,
       isMajor: this.state.isMajor
-  })
-  .then((response) => {
-      console.log(response)
+   })
+    .then((response) => {
+        console.log(response)
 
-      let startNumr = response.data[0][0]
-    
-      this.setState({
-        startNum : startNumr,
-      })
-      this.createScale(this.state.startNum)
-    
-  })
-  .catch(function (error) {
-      console.log(error);
-  });
-  
-  
-
-} 
+        let startNumr = response.data[0][0]
+      
+        this.setState({
+          startNum : startNumr,
+        })
+        this.createScale(this.state.startNum)
+      
+    })
+    .catch(function (error) {
+        console.log(error);
+    });
+  } 
 
   createScale = (startNumber) => {
     //Follow W-W-H-W-W-W-H for major 
@@ -173,7 +159,6 @@ getFingerings = () => {
     var pattern = []
    
     this.state.isMajor ? this.setState({testScale:[0,2,4,5,7,9,11,12,14,16,17,19,21,23,24]}) : this.setState({testScale : [0,2,3,5,7,8,11,12,14,15,17,19,20,23,24]})
-    
   
     var scaled = this.state.testScale.map((number) => [(startNumber+number+35),(startNumber+number+35)+12]);
   
@@ -211,16 +196,14 @@ getFingerings = () => {
     this.setState({ speed: e.target.value})
   }
 
-
   render() {
     const noteRange = {
       first: MidiNumbers.fromNote('c2'),
       last: MidiNumbers.fromNote('b5'),
     };
     return(
-
       <>
-          <div className = "scales-container">
+        <div className = "scales-container">
           <DimensionsProvider>
             {({ containerWidth, containerHeight }) => (
               <SoundfontProvider
@@ -248,24 +231,24 @@ getFingerings = () => {
         </div>
 
         <div className = "fingering">
-        {this.state.isPlaying ? 
-        <p>{"LH: " }{this.state.LHfingering[this.state.activeNotesIndex]}
-        {"RH: "} {this.state.RHfingering[this.state.activeNotesIndex]}</p>
-      :<p>{<strong>{"Left Fingering: "}</strong>}{this.state.LHfingering}{"   "}{<strong>{"Right Fingering: "}</strong>}{this.state.RHfingering}</p>
-        }
+          {this.state.isPlaying ? 
+          <p>{"LH: " }{this.state.LHfingering[this.state.activeNotesIndex]}
+          {"RH: "} {this.state.RHfingering[this.state.activeNotesIndex]}</p>
+        :<p>{<strong>{"Left Fingering: "}</strong>}{this.state.LHfingering}{"   "}{<strong>{"Right Fingering: "}</strong>}
+        {this.state.RHfingering}</p>
+          }
       </div>
 
-       <div className = "body-container">
+      <div className = "body-container">
         <div>
         
         <FormControl className = "scalesForm" >
         <InputLabel >Key</InputLabel>
               <Select  
-              
-              variant = "outlined"
-              onChange = {this.handleScaleChange}
-              value = {this.state.chosenScale}
-              style = {{backgroundColor: "black"}}
+                variant = "outlined"
+                onChange = {this.handleScaleChange}
+                value = {this.state.chosenScale}
+                style = {{backgroundColor: "black"}}
               >
               <MenuItem value = "C">C</MenuItem>
               <MenuItem value = "C#/D♭">C#/D♭</MenuItem>
@@ -282,77 +265,66 @@ getFingerings = () => {
               </FormControl>
           <FormControl className = "majorMinorForm" >
             <InputLabel id="majmin-label">Major/Minor</InputLabel>
-              <Select
+            <Select
               variant = "outlined"
               onChange = {this.handleMajorMinor}
               value = {this.state.isMajor ? "Major" : "Minor"}
               style = {{backgroundColor: "black"}}
-              >  
-              
-              <MenuItem disabled = {this.state.isMajor} value = "Major">Major</MenuItem>
-              <MenuItem disabled = {this.state.isMinor} value = "Minor">Minor</MenuItem>
-              </Select>
-           </FormControl>
-           <FormControl className = "speedForm">
-             <InputLabel id="speed-label">Speed</InputLabel>
-            
-             <Select
+            >     
+            <MenuItem disabled = {this.state.isMajor} value = "Major">Major</MenuItem>
+            <MenuItem disabled = {this.state.isMinor} value = "Minor">Minor</MenuItem>
+            </Select>
+          </FormControl>
+          <FormControl className = "speedForm">
+            <InputLabel id="speed-label">Speed</InputLabel>
+            <Select
               variant = "outlined"
-             className = "main-select"
-             onChange = {this.handleSpeedChange}
-             value = {this.state.speed}
-             style = {{backgroundColor: "black"}}
+              className = "main-select"
+              onChange = {this.handleSpeedChange}
+              value = {this.state.speed}
+              style = {{backgroundColor: "black"}}
              >
-            
             <MenuItem value = {800}>.25x </MenuItem>
             <MenuItem value = {400}>.5x </MenuItem>
             <MenuItem value = {200}>1x </MenuItem>
-             </Select>
-            
+            </Select>
            </FormControl>
-            
-          
         </div>
 
-
         <div className = "play_buttons_container">
-            <Button
-              variant = "contained"
-              color = "secondary"
-              size = "large"
-              className = 'scale-button'
-             
-                onClick={this.handleScaleClick}
-                >
-                  {this.state.isPlaying ? 'Stop' : 'Play Scale'}
-             </Button>
-        
           <Button
-          variant = "contained"
-          color = "secondary"
-          size = "large"
-          className = "scale-button"
-          onClick = {this.handleArpeggioClick}
+            variant = "contained"
+            color = "secondary"
+            size = "large"
+            className = 'scale-button'
+            onClick={this.handleScaleClick}
+            >
+              {this.state.isPlaying ? 'Stop' : 'Play Scale'}
+            </Button>
+      
+          <Button
+            variant = "contained"
+            color = "secondary"
+            size = "large"
+            className = "scale-button"
+            onClick = {this.handleArpeggioClick}
           >
             {this.state.isPlaying ? 'Stop' : 'Play arpeggio'}
           </Button>
      
         
           <Button
-          variant = "contained"
-          color = "secondary"
-          size = "large"
-          className = "scale-button"
-
+            variant = "contained"
+            color = "secondary"
+            size = "large"
+            className = "scale-button"
           >
             {this.state.isPlaying ? 'Stop' : 'Play Chord'}
           </Button>
-
-        </div>
-        </div>  
+      </div>
+    </div>  
   </>
-
     )}
-                }
+  }
   export default ScalePlayer;
 

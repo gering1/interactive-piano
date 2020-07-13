@@ -2,13 +2,10 @@ a {
     color: white;
 }
 
-
 .startingout-container {
-  
     display:flex;
     flex-direction: column;
     margin:auto;
-    
     align-items: center;
     width: 75%;
     height:100%;
@@ -16,7 +13,6 @@ a {
 }
 
 .books-container {
-    
     display:flex;
     flex-direction: column;
     padding:20px;

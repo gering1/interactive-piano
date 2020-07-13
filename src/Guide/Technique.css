@@ -7,15 +7,8 @@
     width: 75%;
     height: 100%;
     background-color:rgba(0, 0, 0, 0.54);
+}
 
-}
-.technique-general-list {
-   
-   }
- 
-.technique-vids {
-    
-}
 .technique-vid-labels {
     align-items: flex-start;
 }
