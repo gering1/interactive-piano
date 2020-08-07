@@ -25,7 +25,20 @@ function App() {
   const theme = createMuiTheme({
     palette: {
       type: "dark"
-    }
+    },
+      primary: {
+        main: '#f3e5f5',
+      },
+      secondary: {
+        main: '#ad1457',
+      },
+      background: {
+        paper: "#303030 ",
+        
+      },
+      typography: {
+        fontFamily: "Nunito"
+      }
   })
   return (
     <ThemeProvider theme = {theme}>
@@ -38,7 +51,6 @@ function App() {
               <Route exact path='/' component={Home} />
               <Route path = '/Technique' component={Technique}></Route>
               <Route path = '/StartingOut' component={StartingOut}></Route>
-              <Route path = '/Playlist' component={Playlist1}></Route>
               </Router>
             </div>
         </div>

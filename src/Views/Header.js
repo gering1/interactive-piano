@@ -39,36 +39,32 @@ export default  function Header({navigation}) {
   }
   
   return (
- <>
-  <div className = {classes.root}>
-    <AppBar position="static" className = {classes.app}>
-      <Toolbar variant="dense">
-
-
-        <Nav.Link href = "/">
-        <IconButton edge="start"  color="black" aria-label="menu" className={classes.homeButton}>
-          <HomeIcon />
-        </IconButton>
-        </Nav.Link>
+    <>
+    <div className = {classes.root}>
+      <AppBar position="static" className = {classes.app}>
+        <Toolbar variant="dense">
+  
+  
+          <Nav.Link href = "/">
+          <IconButton edge="start"  color="black" aria-label="menu" className={classes.homeButton}>
+            <HomeIcon />
+          </IconButton>
+          </Nav.Link>
+          
+          <IconButton color="inherit" aria-label="menu" className={classes.menuButton}>
         
-        <IconButton color="inherit" aria-label="menu" className={classes.menuButton}>
-      
-        </IconButton>
-        <Nav.Link className = "guidelink odd" href ="StartingOut">
-        <MenuItem key = "startGuide">Starting Out</MenuItem>
-        </Nav.Link>
-
-        <Nav.Link className = "guidelink even" href ="/Technique">
-        <MenuItem key = "startGuide" >Technique</MenuItem>
-        </Nav.Link>
-
-        <Nav.Link className = "guidelink odd" href ="Playlist">
-        <MenuItem key = "startGuide" >My Playlists</MenuItem>
-        </Nav.Link>
-
-      </Toolbar>
-    </AppBar>
-  </div>
-</>
+          </IconButton>
+          <Nav.Link className = "guidelink odd" href ="StartingOut">
+          <MenuItem key = "startGuide">Starting Out</MenuItem>
+          </Nav.Link>
+  
+          <Nav.Link className = "guidelink even" href ="/Technique">
+          <MenuItem key = "startGuide" >Technique</MenuItem>
+          </Nav.Link>
+  
+        </Toolbar>
+      </AppBar>
+    </div>
+  </>
   )};
               

@@ -12,16 +12,18 @@
 }
 
 .main-select {
-  color:black
+  color:black;
+  flex-shrink: 1;
 }
 
-.scale-button {
-  margin-left: 200px;
+.fingeringPaper {
+ color:black;
 }
 
 .scalesForm {
   width: 100px;
   outline-color:black;
+  flex-shrink: 1;
 }
 
 .speedForm {
@@ -30,6 +32,7 @@
 
 .play_buttons_container {
   margin-top: 50px;
+  flex-shrink: 1;
 }
 
 .fingering {
